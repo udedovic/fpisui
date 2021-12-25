@@ -1,0 +1,42 @@
+@import "../../../styles/fonts.css";
+
+.page-body {
+  height: 100vh;
+  background: #31313f;
+  display: flex;
+  flex-direction: column;
+  align-content: center;
+}
+
+h1 {
+  font-family: "Poppins-Bold" !important;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.btn {
+  background: transparent;
+  border-radius: 10px;
+  font-family: "Poppins-SemiBold";
+  transition: 0.3s ease;
+  align-self: center;
+  margin-left: 10px;
+}
+
+.btn-home {
+  color: #398fb4;
+  border: 2px solid #398fb4;
+}
+
+.btn-home:hover {
+  background: #398fb4;
+  color: #fff;
+}
+
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  appearance: none;
+  margin: 0;
+}

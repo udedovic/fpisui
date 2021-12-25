@@ -1,0 +1,45 @@
+@import "../../../styles/fonts.css";
+
+.page-body {
+  height: 100vh;
+  background: #31313f;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+h1 {
+  font-family: "Poppins-Bold" !important;
+  font-size: 2rem;
+  color: #fff;
+}
+
+.btn {
+  background: transparent;
+  font-size: 1.5rem;
+  border-radius: 10px;
+  font-family: "Poppins-SemiBold";
+  padding: 7px;
+  transition: 0.3s ease;
+}
+
+.btn-proizvod {
+  color: #4b8575;
+  border: 2px solid #4b8575;
+  margin-right: 15px;
+}
+
+.btn-proizvod:hover {
+  background: #4b8575;
+  color: #fff;
+}
+
+.btn-radna-lista {
+  color: #cc962b;
+  border: 2px solid #cc962b;
+}
+
+.btn-radna-lista:hover {
+  background: #cc962b;
+  color: #fff;
+}

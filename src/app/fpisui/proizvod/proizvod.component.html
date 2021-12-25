@@ -1,0 +1,112 @@
+<main class="page-body">
+  <div class="d-flex justify-content-center">
+    <h1 class="mt-4 align-self-center">{{ productTitle }}</h1>
+    <button
+      class="btn btn-home d-flex justify-content-center align-content-center"
+      (click)="redirectToMainPage()"
+    >
+      <mat-icon>home</mat-icon>
+    </button>
+  </div>
+  <div class="container-fluid">
+    <div class="row">
+      <div class="card col-lg-10 col-xl-6 mx-auto px-0">
+        <div class="card-body">
+          <section
+            class="
+              form-part
+              align-content-center
+              d-flex
+              justify-content-between
+            "
+          >
+            <div class="left-part">
+              <form [formGroup]="frmProizvod" class="d-flex flex-column">
+                <mat-form-field appearance="outline">
+                  <mat-label>Šifra proizvoda</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="sifraProizvoda"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Dužina proizvoda</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="duzinaProizvoda"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Širina proizvoda</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="sirinaProizvoda"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Visina proizvoda</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="visinaProizvoda"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+                <mat-form-field appearance="outline">
+                  <mat-label>Debljina stakla</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="debljinaStakla"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+              </form>
+            </div>
+            <div class="right-part d-flex flex-column">
+              <button
+                class="btn btn-confirm mb-2"
+                mat-flat-button
+                tabindex="-1"
+                (click)="createNewProduct()"
+              >
+                Novi proizvod
+              </button>
+              <button class="btn btn-other mb-2" mat-flat-button tabindex="-1"
+              (click)="findProduct()">
+                Nađi proizvod
+              </button>
+              <button class="btn btn-other" mat-flat-button tabindex="-1"
+              (click)="changeProduct()">
+                Izmeni proizvod
+              </button>
+            </div>
+          </section>
+          <div class="button-style d-flex justify-content-center">
+            <button
+              class="btn btn-cancel"
+              mat-flat-button
+              tabindex="-1"
+              (click)="resetAllFields()"
+            >
+              PONIŠTI
+            </button>
+            <button
+              class="btn btn-confirm"
+              mat-flat-button
+              (click)="saveProduct()"
+            >
+              SAČUVAJ
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
