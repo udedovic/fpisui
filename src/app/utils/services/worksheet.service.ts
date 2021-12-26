@@ -5,7 +5,7 @@ import { serverURL } from '../config';
 @Injectable({
   providedIn: 'root',
 })
-export class RadnaListaService {
+export class WorksheetService {
   private url = serverURL + 'worksheet/';
 
   constructor(private httpClient: HttpClient) {}

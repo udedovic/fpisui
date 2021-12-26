@@ -1,0 +1,17 @@
+h1 {
+  text-align: center;
+}
+
+p {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  text-align: center;
+}
+
+.redLabel {
+  color: #ff404e;
+}
+
+.greenLabel {
+  color: #6abea7;
+}

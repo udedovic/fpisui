@@ -1,0 +1,10 @@
+<h1 mat-dialog-title [ngClass]="data.isError ? 'redLabel' : 'greenLabel'">{{ data.dialogTitle }}</h1>
+  <div class="row py-md-3 px-md-3">
+    <div class="card-body d-flex flex-column align-items-center">
+      <mat-dialog-content class="mat-typography">
+        <p>
+          {{ data.dialogText }}
+        </p>
+      </mat-dialog-content>
+    </div>
+  </div>
