@@ -3,6 +3,7 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { Router } from '@angular/router';
 import { InformationDialogComponent } from 'src/app/shared-module/information-dialog/information-dialog.component';
+import { FormMode } from 'src/app/utils/form-mode';
 import { IProduct } from 'src/app/utils/interfaces/product';
 import { ProductService } from 'src/app/utils/services/product.service';
 
@@ -14,6 +15,7 @@ import { ProductService } from 'src/app/utils/services/product.service';
 export class ProizvodComponent implements OnInit {
   productTitle: string = 'Unos proizvoda';
   frmProizvod: FormGroup;
+  frmProizvodMode: FormMode = FormMode.insert;
 
   constructor(
     private router: Router,
@@ -39,6 +41,8 @@ export class ProizvodComponent implements OnInit {
   createNewProduct() {
     this.productService.getNewId().subscribe((id) => {
       this.resetAllFields();
+      this.frmProizvodMode = FormMode.insert;
+      this.productTitle = "Unos proizvoda";
       this.frmProizvod.get('sifraProizvoda').setValue(id);
     });
   }
@@ -51,36 +55,15 @@ export class ProizvodComponent implements OnInit {
       .findProduct(this.frmProizvod.get('sifraProizvoda').value)
       .subscribe((product) => {
         if (product) {
+          this.frmProizvodMode = FormMode.update;
+          this.productTitle = "Izmena proizvoda";
           this.frmProizvod.setValue(product);
         } else {
+          this.productTitle = "Unos proizvoda";
+          this.frmProizvodMode = FormMode.insert;
           this.openDialog(true, 'Greška', 'Uneli ste nepostojeći proizvod!');
         }
       });
-  }
-
-  changeProduct() {
-    if (this.frmProizvod.invalid) {
-      this.openDialog(true, 'Greška', 'Sva polja su obavezna!');
-      return;
-    }
-    let product: IProduct = this.createProductFromForm();
-    this.productService.updateProduct(product).subscribe({
-      next: (response) => {
-        if (response) {
-          this.openDialog(
-            false,
-            'Obaveštenje',
-            'Uspešno ste izmenili proizvod!'
-          );
-        } else {
-          this.openDialog(
-            true,
-            'Greška',
-            'Došlo je do greške prilikom čuvanja proizvoda!'
-          );
-        }
-      },
-    });
   }
 
   saveProduct() {
@@ -89,23 +72,11 @@ export class ProizvodComponent implements OnInit {
       return;
     }
     let product: IProduct = this.createProductFromForm();
-    this.productService.insertProduct(product).subscribe({
-      next: (response) => {
-        if (response) {
-          this.openDialog(
-            false,
-            'Obaveštenje',
-            'Uspešno ste uneli novi proizvod!'
-          );
-        } else {
-          this.openDialog(
-            true,
-            'Greška',
-            'Došlo je do greške prilikom čuvanja proizvoda!'
-          );
-        }
-      },
-    });
+    if ((this.frmProizvodMode as FormMode) === FormMode.insert) {
+      this.insertProduct(product);
+    } else {
+      this.updateProduct(product);
+    }
   }
 
   createProductFromForm() {
@@ -118,8 +89,51 @@ export class ProizvodComponent implements OnInit {
     };
   }
 
+  insertProduct(product: IProduct) {
+    this.productService.insertProduct(product).subscribe({
+      next: (response) => {
+        if (response) {
+          this.openDialog(
+            false,
+            'Obaveštenje',
+            'Uspešno ste uneli novi proizvod!'
+          );
+          this.resetAllFields();
+        } else {
+          this.openDialog(
+            true,
+            'Greška',
+            'Došlo je do greške prilikom čuvanja proizvoda!'
+          );
+        }
+      },
+    });
+  }
+
+  updateProduct(product: IProduct) {
+    this.productService.updateProduct(product).subscribe({
+      next: (response) => {
+        if (response) {
+          this.openDialog(
+            false,
+            'Obaveštenje',
+            'Uspešno ste izmenili proizvod!'
+          );
+          this.resetAllFields();
+        } else {
+          this.openDialog(
+            true,
+            'Greška',
+            'Došlo je do greške prilikom čuvanja proizvoda!'
+          );
+        }
+      },
+    });
+  }
+
   resetAllFields() {
     this.frmProizvod.reset();
+    this.frmProizvodMode = FormMode.insert;
     this.productTitle = 'Unos proizvoda';
   }
 

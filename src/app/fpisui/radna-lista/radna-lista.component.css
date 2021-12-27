@@ -8,6 +8,23 @@
   align-content: center;
 }
 
+.main-part {
+  height: 89vh;
+}
+
+.item-card {
+  height: 61vh;
+}
+
+.radnik-table {
+  width: 40%;
+  height: 50px !important;
+}
+
+.stavke-table{
+  width: 100%;
+}
+
 h1 {
   font-family: "Poppins-Bold" !important;
   font-size: 2rem;
@@ -31,6 +48,123 @@ h1 {
 .btn-home:hover {
   background: #398fb4;
   color: #fff;
+}
+
+.btn-other {
+  color: #cc962b;
+  border: 2px solid #cc962b;
+}
+
+.btn-other:hover {
+  background: #cc962b;
+  color: #fff;
+}
+
+.btn-confirm {
+  color: #6abea7;
+  border: 2px solid #6abea7;
+}
+
+.btn-confirm:hover {
+  background: #6abea7;
+  color: #fff;
+}
+
+.btn-cancel {
+  color: #ff404e;
+  border: 2px solid #ff404e;
+}
+
+.btn-cancel:hover {
+  background: #ff404e;
+  color: #fff;
+}
+
+.card {
+  border-radius: 20px;
+  background: transparent;
+  border-color: #6abea7;
+  padding: 10px;
+}
+
+.card-body {
+  padding: 10px;
+}
+
+input,
+label,
+p,
+small {
+  font-family: "Poppins-Regular" !important;
+}
+
+.datepicker,
+.input-field {
+  max-width: 200px;
+}
+
+.lbl-evidencija {
+  font-family: "Poppins-Bold" !important;
+}
+
+:host ::ng-deep .mat-input-element {
+  caret-color: #6abea7;
+  color: #fff;
+}
+
+:host ::ng-deep .mat-form-field-label {
+  color: #fff;
+}
+
+:host ::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  color: #6abea7;
+}
+
+:host ::ng-deep .mat-form-field.mat-focused .mat-form-field-ripple {
+  background-color: #6abea7;
+}
+
+:host ::ng-deep .mat-form-field.mat-focused .mat-form-field-label {
+  font-size: 0.85rem;
+}
+
+:host ::ng-deep .mat-form-field-should-float .mat-form-field-label {
+  font-size: 0.85rem;
+}
+
+:host ::ng-deep .mat-form-field-appearance-outline .mat-form-field-outline {
+  color: #cccccc;
+}
+
+:host ::ng-deep .mat-form-field-appearance-fill .mat-form-field-flex {
+  background-color: rgba(0, 0, 0, 0.04);
+}
+
+:host ::ng-deep .mat-form-field-underline {
+  background: black !important;
+}
+
+:host ::ng-deep .mat-form-field.mat-focused .mat-form-field-outline {
+  color: #6abea7;
+}
+
+:host ::ng-deep mat-label {
+  color: #fff !important;
+}
+
+:host
+  ::ng-deep
+  .mat-primary
+  .mat-option.mat-selected:not(.mat-option-disabled) {
+  color: #6abea7;
+}
+
+:host ::ng-deep .mat-form-field.mat-focused.mat-primary .mat-select-arrow {
+  color: #6abea7;
+}
+
+:host ::ng-deep .mat-select-value {
+  color: #000 !important;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
