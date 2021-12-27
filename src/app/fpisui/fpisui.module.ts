@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { MainPageComponent } from './main-page/main-page.component';
 import { RadnaListaComponent } from './radna-lista/radna-lista.component';
 import { ProizvodComponent } from './proizvod/proizvod.component';
@@ -39,6 +39,7 @@ import { MatNativeDateModule, MAT_DATE_LOCALE } from '@angular/material/core';
   ],
   providers: [
     MatDatepickerModule,
+    DatePipe,
     { provide: MAT_DATE_LOCALE, useValue: 'en-GB' },
   ],
 })

@@ -1,11 +1,13 @@
 export interface IPresenceItem {
+  worksheetId: number;
   redniBroj: number;
   vrstaPrisustva: number;
-  opisStavke: string;
+  opis: string;
   datum: Date;
 }
 
 export interface IAbsenceItem {
+  worksheetId: number;
   redniBroj: number;
   brojOdluke: number;
   vrstaOdsustva: number;

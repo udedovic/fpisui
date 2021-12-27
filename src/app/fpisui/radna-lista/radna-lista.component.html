@@ -12,108 +12,269 @@
     <div class="row">
       <div class="main-part card col-lg-10 col-xl-11 mx-auto px-0">
         <div class="card-body">
-          <section
-            class="
-              form-part
-              align-content-center
-              d-flex
-              justify-content-between
-              px-5
-            "
-          >
-            <div class="d-flex flex-column">
-              <mat-form-field appearance="outline">
-                <mat-label>Šifra radnika</mat-label>
-                <input
-                  type="number"
-                  matInput
-                  [formControl]="sifraRadnikaInput"
-                  autocomplete="off"
-                />
-              </mat-form-field>
-              <button
-                class="btn btn-other mb-2"
-                mat-flat-button
-                tabindex="-1"
-                (click)="findWorker()"
-              >
-                Nađi radnika
-              </button>
-            </div>
-            <div class="d-flex flex-column">
-              <mat-form-field appearance="outline">
-                <mat-label>Šifra radne liste</mat-label>
-                <input
-                  type="number"
-                  matInput
-                  [formControl]="sifraRadneListe"
-                  autocomplete="off"
-                />
-              </mat-form-field>
-              <div class="d-flex justify-content-between">
+          <form [formGroup]="frmWorksheet">
+            <section
+              class="
+                form-part
+                align-content-center
+                d-flex
+                justify-content-between
+                px-5
+              "
+            >
+              <div class="d-flex flex-column">
+                <mat-form-field appearance="outline">
+                  <mat-label>Šifra radne liste</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="sifraRadneListe"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
+                <div class="d-flex justify-content-between">
+                  <button
+                    class="btn btn-other mb-2"
+                    mat-flat-button
+                    tabindex="-1"
+                    (click)="findWorksheet($event)"
+                  >
+                    Nađi radnu listu
+                  </button>
+                  <button
+                    class="btn btn-confirm mb-2"
+                    mat-flat-button
+                    tabindex="-1"
+                    (click)="createNewWorksheet($event)"
+                  >
+                    Nova radna lista
+                  </button>
+                </div>
+              </div>
+
+              <div class="d-flex flex-column">
+                <mat-form-field appearance="outline">
+                  <mat-label>Šifra radnika</mat-label>
+                  <input
+                    type="number"
+                    matInput
+                    formControlName="sifraRadnika"
+                    autocomplete="off"
+                  />
+                </mat-form-field>
                 <button
                   class="btn btn-other mb-2"
                   mat-flat-button
                   tabindex="-1"
-                  (click)="findWorksheet()"
+                  (click)="findWorker($event)"
                 >
-                  Nađi radnu listu
-                </button>
-                <button
-                  class="btn btn-confirm mb-2"
-                  mat-flat-button
-                  tabindex="-1"
-                  (click)="createNewWorksheet()"
-                >
-                  Nova radna lista
+                  Nađi radnika
                 </button>
               </div>
-            </div>
-            <table
-              mat-table
-              [dataSource]="radnikTable"
-              class="mat-elevation-z8 radnik-table"
-            >
-              <ng-container matColumnDef="imePrezime">
-                <th mat-header-cell *matHeaderCellDef>Ime i prezime</th>
-                <td mat-cell *matCellDef="let worker">
-                  {{ worker.imePrezime }}
-                </td>
-              </ng-container>
 
-              <ng-container matColumnDef="jmbg">
-                <th mat-header-cell *matHeaderCellDef>JMBG</th>
-                <td mat-cell *matCellDef="let worker">{{ worker.jmbg }}</td>
-              </ng-container>
+              <table
+                mat-table
+                [dataSource]="radnikTable"
+                class="mat-elevation-z8 radnik-table"
+              >
+                <ng-container matColumnDef="imePrezime">
+                  <th mat-header-cell *matHeaderCellDef>Ime i prezime</th>
+                  <td mat-cell *matCellDef="let worker">
+                    {{ worker.imePrezime }}
+                  </td>
+                </ng-container>
 
-              <ng-container matColumnDef="radnoMesto">
-                <th mat-header-cell *matHeaderCellDef>Radno mesto</th>
-                <td mat-cell *matCellDef="let worker">
-                  {{ worker.radnoMesto }}
-                </td>
-              </ng-container>
+                <ng-container matColumnDef="jmbg">
+                  <th mat-header-cell *matHeaderCellDef>JMBG</th>
+                  <td mat-cell *matCellDef="let worker">{{ worker.jmbg }}</td>
+                </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="radnikTableColumns"></tr>
-              <tr
-                mat-row
-                *matRowDef="let row; columns: radnikTableColumns"
-              ></tr>
-            </table>
-          </section>
+                <ng-container matColumnDef="radnoMesto">
+                  <th mat-header-cell *matHeaderCellDef>Radno mesto</th>
+                  <td mat-cell *matCellDef="let worker">
+                    {{ worker.radnoMesto }}
+                  </td>
+                </ng-container>
 
-          <section class="items-part d-flex justify-content-between">
-            <div class="container-fluid">
-              <div class="row">
-                <div class="item-card card col-lg-10 col-xl-12 mx-auto px-0">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex flex-column">
+                <tr mat-header-row *matHeaderRowDef="radnikTableColumns"></tr>
+                <tr
+                  mat-row
+                  *matRowDef="let row; columns: radnikTableColumns"
+                ></tr>
+              </table>
+            </section>
+
+            <section class="items-part d-flex justify-content-between">
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="item-card card col-lg-10 col-xl-12 mx-auto px-0">
+                    <div class="card-body">
+                      <form formGroupName="prisustvo">
                         <div class="d-flex justify-content-between">
-                          <div>
-                            <div>
-                              <mat-label class="lbl-evidencija"
-                                >Stavke evidencije prisustva</mat-label
-                              >
+                          <div class="d-flex flex-column">
+                            <div class="d-flex justify-content-between">
+                              <div>
+                                <div>
+                                  <mat-label class="lbl-evidencija"
+                                    >Stavke evidencije prisustva</mat-label
+                                  >
+                                  <mat-form-field
+                                    appearance="outline"
+                                    class="input-field"
+                                  >
+                                    <mat-label>Redni broj</mat-label>
+                                    <input
+                                      type="number"
+                                      matInput
+                                      formControlName="redniBrojPrisustva"
+                                      autocomplete="off"
+                                    />
+                                  </mat-form-field>
+                                </div>
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="input-field"
+                                >
+                                  <mat-label>Vrsta prisustva</mat-label>
+                                  <select
+                                    matNativeControl
+                                    formControlName="vrstaPrisustva"
+                                  >
+                                    <option value="0" selected>
+                                      Radno vreme
+                                    </option>
+                                    <option value="1">Prekovremeno</option>
+                                    <option value="2">Vikend</option>
+                                    <option value="3">Praznik</option>
+                                  </select>
+                                </mat-form-field>
+                              </div>
+                              <div class="mt-1">
+                                <mat-form-field
+                                  appearance="outline"
+                                  class="input-field"
+                                >
+                                  <mat-label>Opis prisustva</mat-label>
+                                  <textarea
+                                    matInput
+                                    formControlName="opisPrisustva"
+                                  >
+                                  </textarea>
+                                </mat-form-field>
+                                <mat-form-field
+                                  appearance="outline"
+                                  color="#6abea7"
+                                  class="datepicker"
+                                >
+                                  <mat-label>Datum prisustva</mat-label>
+                                  <input
+                                    matInput
+                                    [matDatepicker]="picker1"
+                                    formControlName="datumPrisustva"
+                                    (click)="picker1.open()"
+                                    readonly
+                                  />
+                                  <mat-datepicker-toggle
+                                    matSuffix
+                                    [for]="picker1"
+                                  ></mat-datepicker-toggle>
+                                  <mat-datepicker #picker1></mat-datepicker>
+                                </mat-form-field>
+                              </div>
+                            </div>
+                          </div>
+                          <div class="mt-2 button-style d-flex flex-column">
+                            <button
+                              class="btn btn-cancel mb-1"
+                              mat-flat-button
+                              tabindex="-1"
+                              (click)="deletePresenceItem($event)"
+                            >
+                              Obriši stavku
+                            </button>
+                            <button
+                              class="btn btn-confirm"
+                              mat-flat-button
+                              (click)="savePresenceItem($event)"
+                            >
+                              Sačuvaj stavku
+                            </button>
+                          </div>
+                        </div>
+                        <section class="item-table-section">
+                          <table
+                            mat-table
+                            [dataSource]="prisustvoTable"
+                            class="mat-elevation-z8 stavke-table"
+                          >
+                            <ng-container matColumnDef="redniBroj">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Redni broj
+                              </th>
+                              <td mat-cell *matCellDef="let presence">
+                                {{ presence.redniBroj }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="vrstaPrisustva">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Vrsta prisustva
+                              </th>
+                              <td mat-cell *matCellDef="let presence">
+                                {{
+                                  preparePresenceType(presence.vrstaPrisustva)
+                                }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="opis">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Opis stavke
+                              </th>
+                              <td mat-cell *matCellDef="let presence">
+                                {{ presence.opis }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="datum">
+                              <th mat-header-cell *matHeaderCellDef>Datum</th>
+                              <td mat-cell *matCellDef="let presence">
+                                {{ showDate(presence.datum) }}
+                              </td>
+                            </ng-container>
+
+                            <tr
+                              mat-header-row
+                              *matHeaderRowDef="
+                                prisustvoTableColumns;
+                                sticky: true
+                              "
+                            ></tr>
+                            <tr
+                              mat-row
+                              *matRowDef="
+                                let row;
+                                columns: prisustvoTableColumns
+                              "
+                            ></tr>
+                          </table>
+                        </section>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <div class="container-fluid">
+                <div class="row">
+                  <div class="item-card card col-lg-10 col-xl-12 mx-auto px-0">
+                    <div class="card-body">
+                      <form formGroupName="odsustvo">
+                        <div class="d-flex justify-content-between">
+                          <div class="d-flex flex-column">
+                            <mat-label class="lbl-evidencija"
+                              >Stavke evidencije odsustva</mat-label
+                            >
+                            <div class="d-flex justify-content-between">
                               <mat-form-field
                                 appearance="outline"
                                 class="input-field"
@@ -122,289 +283,194 @@
                                 <input
                                   type="number"
                                   matInput
-                                  [formControl]="redniBrojPrisustva"
+                                  formControlName="redniBrojOdsustva"
+                                  autocomplete="off"
+                                />
+                              </mat-form-field>
+                              <mat-form-field
+                                appearance="outline"
+                                class="input-field"
+                              >
+                                <mat-label>Broj odluke</mat-label>
+                                <input
+                                  type="number"
+                                  matInput
+                                  formControlName="brojOdluke"
                                   autocomplete="off"
                                 />
                               </mat-form-field>
                             </div>
-                            <mat-form-field
-                              appearance="outline"
-                              class="input-field"
-                            >
-                              <mat-label>Vrsta prisustva</mat-label>
-                              <select
-                                matNativeControl
-                                [formControl]="vrstaPrisustva"
-                              >
-                                <option value="0" selected>Radno vreme</option>
-                                <option value="1">Prekovremeno</option>
-                                <option value="2">Vikend</option>
-                                <option value="3">Praznik</option>
-                              </select>
-                            </mat-form-field>
                           </div>
-                          <div class="mt-1">
-                            <mat-form-field
-                              appearance="outline"
-                              class="input-field"
+                          <div class="mt-2 button-style d-flex flex-column">
+                            <button
+                              class="btn btn-cancel mb-1"
+                              mat-flat-button
+                              tabindex="-1"
+                              (click)="deleteAbsenceItem($event)"
                             >
-                              <mat-label>Opis prisustva</mat-label>
-                              <textarea matInput [formControl]="opisPrisustva">
-                              </textarea>
-                            </mat-form-field>
-                            <mat-form-field
-                              appearance="outline"
-                              color="#6abea7"
-                              class="datepicker"
+                              Obriši stavku
+                            </button>
+                            <button
+                              class="btn btn-confirm"
+                              mat-flat-button
+                              (click)="saveAbsenceItem($event)"
                             >
-                              <mat-label>Datum prisustva</mat-label>
-                              <input
-                                matInput
-                                [matDatepicker]="picker1"
-                                [formControl]="datumPrisustva"
-                              />
-                              <mat-datepicker-toggle
-                                matSuffix
-                                [for]="picker1"
-                              ></mat-datepicker-toggle>
-                              <mat-datepicker #picker1></mat-datepicker>
-                            </mat-form-field>
+                              Sačuvaj stavku
+                            </button>
                           </div>
                         </div>
-                      </div>
-                      <div class="mt-2 button-style d-flex flex-column">
-                        <button
-                          class="btn btn-cancel mb-1"
-                          mat-flat-button
-                          tabindex="-1"
-                          (click)="deletePresenceItem()"
-                        >
-                          Obriši stavku
-                        </button>
-                        <button
-                          class="btn btn-confirm"
-                          mat-flat-button
-                          (click)="savePresenceItem()"
-                        >
-                          Sačuvaj stavku
-                        </button>
-                      </div>
-                    </div>
-                    <table
-                      mat-table
-                      [dataSource]="prisustvoTable"
-                      class="mat-elevation-z8 stavke-table"
-                    >
-                      <ng-container matColumnDef="redniBroj">
-                        <th mat-header-cell *matHeaderCellDef>Redni broj</th>
-                        <td mat-cell *matCellDef="let presence">
-                          {{ presence.redniBroj }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="vrstaPrisustva">
-                        <th mat-header-cell *matHeaderCellDef>
-                          Vrsta prisustva
-                        </th>
-                        <td mat-cell *matCellDef="let presence">
-                          {{ presence.vrstaPrisustva }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="opis">
-                        <th mat-header-cell *matHeaderCellDef>Opis stavke</th>
-                        <td mat-cell *matCellDef="let presence">
-                          {{ presence.opis }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="datum">
-                        <th mat-header-cell *matHeaderCellDef>Datum</th>
-                        <td mat-cell *matCellDef="let presence">
-                          {{ presence.datum }}
-                        </td>
-                      </ng-container>
-
-                      <tr
-                        mat-header-row
-                        *matHeaderRowDef="prisustvoTableColumns"
-                      ></tr>
-                      <tr
-                        mat-row
-                        *matRowDef="let row; columns: prisustvoTableColumns"
-                      ></tr>
-                    </table>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <div class="container-fluid">
-              <div class="row">
-                <div class="item-card card col-lg-10 col-xl-12 mx-auto px-0">
-                  <div class="card-body">
-                    <div class="d-flex justify-content-between">
-                      <div class="d-flex flex-column">
-                        <mat-label class="lbl-evidencija"
-                          >Stavke evidencije odsustva</mat-label
-                        >
                         <div class="d-flex justify-content-between">
                           <mat-form-field
                             appearance="outline"
                             class="input-field"
                           >
-                            <mat-label>Redni broj</mat-label>
-                            <input
-                              type="number"
-                              matInput
-                              [formControl]="redniBrojOdsustva"
-                              autocomplete="off"
-                            />
+                            <mat-label>Vrsta odsustva</mat-label>
+                            <select
+                              matNativeControl
+                              formControlName="vrstaOdsustva"
+                            >
+                              <option value="0">Godišnji odmor</option>
+                              <option value="1">Službeni put</option>
+                              <option value="2">Bolovanje</option>
+                              <option value="3">Plaćeno odsustvo</option>
+                              <option value="4">Neplaćeno odsustvo</option>
+                              <option value="5">Praznik</option>
+                              <option value="6">Slava</option>
+                              <option value="7">Slobodan dan</option>
+                              <option value="8">Neopravdano odsustvo</option>
+                            </select>
                           </mat-form-field>
                           <mat-form-field
                             appearance="outline"
-                            class="input-field"
+                            color="#6abea7"
+                            class="datepicker"
                           >
-                            <mat-label>Broj odluke</mat-label>
+                            <mat-label>Datum od</mat-label>
                             <input
-                              type="number"
                               matInput
-                              [formControl]="brojOdluke"
-                              autocomplete="off"
+                              [matDatepicker]="picker2"
+                              formControlName="datumOd"
+                              (click)="picker2.open()"
+                              readonly
                             />
+                            <mat-datepicker-toggle
+                              matSuffix
+                              [for]="picker2"
+                            ></mat-datepicker-toggle>
+                            <mat-datepicker #picker2></mat-datepicker>
+                          </mat-form-field>
+                          <mat-form-field
+                            appearance="outline"
+                            color="#6abea7"
+                            class="datepicker"
+                          >
+                            <mat-label>Datum do</mat-label>
+                            <input
+                              matInput
+                              [matDatepicker]="picker3"
+                              formControlName="datumDo"
+                              (click)="picker3.open()"
+                              readonly
+                            />
+                            <mat-datepicker-toggle
+                              matSuffix
+                              [for]="picker3"
+                            ></mat-datepicker-toggle>
+                            <mat-datepicker #picker3></mat-datepicker>
                           </mat-form-field>
                         </div>
-                      </div>
-                      <div class="mt-2 button-style d-flex flex-column">
-                        <button
-                          class="btn btn-cancel mb-1"
-                          mat-flat-button
-                          tabindex="-1"
-                          (click)="deleteAbsenceItem()"
-                        >
-                          Obriši stavku
-                        </button>
-                        <button
-                          class="btn btn-confirm"
-                          mat-flat-button
-                          (click)="saveAbsenceItem()"
-                        >
-                          Sačuvaj stavku
-                        </button>
-                      </div>
+
+                        <section class="item-table-section">
+                          <table
+                            mat-table
+                            [dataSource]="odsustvoTable"
+                            class="mat-elevation-z8 stavke-table"
+                          >
+                            <ng-container matColumnDef="redniBroj">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Redni broj
+                              </th>
+                              <td mat-cell *matCellDef="let absence">
+                                {{ absence.redniBroj }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="brojOdluke">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Broj odluke
+                              </th>
+                              <td mat-cell *matCellDef="let absence">
+                                {{ absence.brojOdluke }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="vrstaOdsustva">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Vrsta odsustva
+                              </th>
+                              <td mat-cell *matCellDef="let absence">
+                                {{ prepareAbsenceType(absence.vrstaOdsustva) }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="datumOd">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Datum od
+                              </th>
+                              <td mat-cell *matCellDef="let absence">
+                                {{ showDate(absence.datumOd) }}
+                              </td>
+                            </ng-container>
+
+                            <ng-container matColumnDef="datumDo">
+                              <th mat-header-cell *matHeaderCellDef>
+                                Datum do
+                              </th>
+                              <td mat-cell *matCellDef="let absence">
+                                {{ showDate(absence.datumDo) }}
+                              </td>
+                            </ng-container>
+
+                            <tr
+                              mat-header-row
+                              *matHeaderRowDef="
+                                odsustvoTableColumns;
+                                sticky: true
+                              "
+                            ></tr>
+                            <tr
+                              mat-row
+                              *matRowDef="
+                                let row;
+                                columns: odsustvoTableColumns
+                              "
+                            ></tr>
+                          </table>
+                        </section>
+                      </form>
                     </div>
-                    <div class="d-flex justify-content-between">
-                      <mat-form-field appearance="outline" class="input-field">
-                        <mat-label>Vrsta odsustva</mat-label>
-                        <select matNativeControl [formControl]="vrstaOdsustva">
-                          <option value="0">Godišnji odmor</option>
-                          <option value="1">Službeni put</option>
-                          <option value="2">Bolovanje</option>
-                          <option value="3">Plaćeno odsustvo</option>
-                          <option value="4">Neplaćeno odsustvo</option>
-                          <option value="5">Praznik</option>
-                          <option value="6">Slava</option>
-                          <option value="7">Slobodan dan</option>
-                          <option value="8">Neopravdano odsustvo</option>
-                        </select>
-                      </mat-form-field>
-                      <mat-form-field
-                        appearance="outline"
-                        color="#6abea7"
-                        class="datepicker"
-                      >
-                        <mat-label>Datum od</mat-label>
-                        <input
-                          matInput
-                          [matDatepicker]="picker2"
-                          [formControl]="datumOd"
-                        />
-                        <mat-datepicker-toggle
-                          matSuffix
-                          [for]="picker2"
-                        ></mat-datepicker-toggle>
-                        <mat-datepicker #picker2></mat-datepicker>
-                      </mat-form-field>
-                      <mat-form-field
-                        appearance="outline"
-                        color="#6abea7"
-                        class="datepicker"
-                      >
-                        <mat-label>Datum do</mat-label>
-                        <input
-                          matInput
-                          [matDatepicker]="picker3"
-                          [formControl]="datumDo"
-                        />
-                        <mat-datepicker-toggle
-                          matSuffix
-                          [for]="picker3"
-                        ></mat-datepicker-toggle>
-                        <mat-datepicker #picker3></mat-datepicker>
-                      </mat-form-field>
-                    </div>
-
-                    <table
-                      mat-table
-                      [dataSource]="odsustvoTable"
-                      class="mat-elevation-z8 stavke-table"
-                    >
-                      <ng-container matColumnDef="redniBroj">
-                        <th mat-header-cell *matHeaderCellDef>Redni broj</th>
-                        <td mat-cell *matCellDef="let absence">
-                          {{ absence.redniBroj }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="brojOdluke">
-                        <th mat-header-cell *matHeaderCellDef>Broj odluke</th>
-                        <td mat-cell *matCellDef="let absence">
-                          {{ absence.brojOdluke }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="vrstaOdsustva">
-                        <th mat-header-cell *matHeaderCellDef>
-                          Vrsta odsustva
-                        </th>
-                        <td mat-cell *matCellDef="let absence">
-                          {{ absence.vrstaOdsustva }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="datumOd">
-                        <th mat-header-cell *matHeaderCellDef>Datum od</th>
-                        <td mat-cell *matCellDef="let absence">
-                          {{ absence.datumOd }}
-                        </td>
-                      </ng-container>
-
-                      <ng-container matColumnDef="datumDo">
-                        <th mat-header-cell *matHeaderCellDef>Datum do</th>
-                        <td mat-cell *matCellDef="let absence">
-                          {{ absence.datumDo }}
-                        </td>
-                      </ng-container>
-
-                      <tr
-                        mat-header-row
-                        *matHeaderRowDef="odsustvoTableColumns"
-                      ></tr>
-                      <tr
-                        mat-row
-                        *matRowDef="let row; columns: odsustvoTableColumns"
-                      ></tr>
-                    </table>
                   </div>
                 </div>
               </div>
+            </section>
+            <div class="mt-2 button-style d-flex justify-content-center">
+              <button
+                class="btn btn-cancel"
+                mat-flat-button
+                tabindex="-1"
+                (click)="resetAllFields($event)"
+              >
+                PONIŠTI
+              </button>
+              <button
+                class="btn btn-confirm"
+                mat-flat-button
+                (click)="saveWorksheet($event)"
+              >
+                SAČUVAJ
+              </button>
             </div>
-          </section>
-          <div class="mt-2 button-style d-flex justify-content-center">
-            <button class="btn btn-cancel" mat-flat-button tabindex="-1">
-              PONIŠTI
-            </button>
-            <button class="btn btn-confirm" mat-flat-button>SAČUVAJ</button>
-          </div>
+          </form>
         </div>
       </div>
     </div>

@@ -21,8 +21,22 @@
   height: 50px !important;
 }
 
-.stavke-table{
+.item-table-section {
+  max-height: 30vh !important;
+  overflow: auto;
+}
+
+.stavke-table {
   width: 100%;
+}
+
+.item-table-section::-webkit-scrollbar {
+  color: #6abea7 !important;
+  width: 8px !important;
+}
+
+textarea {
+  max-height: 40px !important;
 }
 
 h1 {
@@ -165,6 +179,18 @@ small {
 
 :host ::ng-deep .mat-select-value {
   color: #000 !important;
+}
+
+:host ::ng-deep datepicker-value-example .mat-form-field-label{
+  color:#6abea7;
+}
+
+:host ::ng-deep .mat-datepicker-toggle{
+  color:#6abea7;
+}
+
+::ng-deep .mat-calendar-body-selected{
+  background-color: #6abea7;
 }
 
 input[type="number"]::-webkit-inner-spin-button,
