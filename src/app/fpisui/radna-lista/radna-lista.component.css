@@ -121,6 +121,10 @@ small {
   font-family: "Poppins-Bold" !important;
 }
 
+.highlight{
+  background: #6abea7;
+}
+
 :host ::ng-deep .mat-input-element {
   caret-color: #6abea7;
   color: #fff;

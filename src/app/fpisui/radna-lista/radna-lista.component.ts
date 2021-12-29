@@ -1,17 +1,14 @@
 import { DatePipe } from '@angular/common';
 import { Component, OnInit } from '@angular/core';
-import {
-  FormBuilder,
-  FormControl,
-  FormGroup,
-  Validators,
-} from '@angular/forms';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { MatTableDataSource } from '@angular/material/table';
 import { Router } from '@angular/router';
 import { InformationDialogComponent } from 'src/app/shared-module/information-dialog/information-dialog.component';
+import { FormMode } from 'src/app/utils/form-mode';
 import { IAbsenceItem, IPresenceItem } from 'src/app/utils/interfaces/item';
 import { IWorker } from 'src/app/utils/interfaces/worker';
+import { IWorksheet } from 'src/app/utils/interfaces/worksheet';
 import { WorkerService } from 'src/app/utils/services/worker.service';
 import { WorksheetService } from 'src/app/utils/services/worksheet.service';
 
@@ -23,27 +20,31 @@ import { WorksheetService } from 'src/app/utils/services/worksheet.service';
 export class RadnaListaComponent implements OnInit {
   //top part
   worksheetTitle: string = 'Unos radne liste';
-  ELEMENT_DATA_RADNIK: IWorker[] = [];
-  radnikTable = new MatTableDataSource(this.ELEMENT_DATA_RADNIK);
+  ELEMENT_DATA_WORKER: IWorker[] = [];
+  radnikTable = new MatTableDataSource(this.ELEMENT_DATA_WORKER);
   radnikTableColumns: string[] = ['imePrezime', 'jmbg', 'radnoMesto'];
+  currentWorker: IWorker = null;
 
   //forma
   frmWorksheet: FormGroup;
+  frmWorksheetMode: FormMode = FormMode.insert;
 
   //prisustvo
-
-  ELEMENT_DATA_PRISUSTVO: IPresenceItem[] = [];
-  prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRISUSTVO);
+  ELEMENT_DATA_PRESENCE: IPresenceItem[] = [];
+  prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
   prisustvoTableColumns: string[] = [
     'redniBroj',
     'vrstaPrisustva',
     'opis',
     'datum',
   ];
+  nextRedniBrojPrisustvo: number = 1;
+  presenceMode: FormMode = FormMode.insert;
+  selectedPresenceRowIndex = -1;
 
   //odsustvo
-  ELEMENT_DATA_ODSUSTVO: IAbsenceItem[] = [];
-  odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ODSUSTVO);
+  ELEMENT_DATA_ABSENCE: IAbsenceItem[] = [];
+  odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
   odsustvoTableColumns: string[] = [
     'redniBroj',
     'brojOdluke',
@@ -51,6 +52,9 @@ export class RadnaListaComponent implements OnInit {
     'datumOd',
     'datumDo',
   ];
+  nextRedniBrojOdsustvo: number = 1;
+  abseceneMode: FormMode = FormMode.insert;
+  selectedAbsenceRowIndex = -1;
 
   constructor(
     private router: Router,
@@ -70,13 +74,19 @@ export class RadnaListaComponent implements OnInit {
       sifraRadnika: [null, Validators.required],
       sifraRadneListe: [null, Validators.required],
       prisustvo: this.formBuilder.group({
-        redniBrojPrisustva: [null, Validators.required],
+        redniBrojPrisustva: [
+          { value: null, disabled: true },
+          Validators.required,
+        ],
         vrstaPrisustva: ['0', Validators.required],
         opisPrisustva: [null, Validators.required],
         datumPrisustva: [new Date(), Validators.required],
       }),
       odsustvo: this.formBuilder.group({
-        redniBrojOdsustva: [null, Validators.required],
+        redniBrojOdsustva: [
+          { value: null, disabled: true },
+          Validators.required,
+        ],
         vrstaOdsustva: ['0', Validators.required],
         brojOdluke: [null, Validators.required],
         datumOd: [new Date(), Validators.required],
@@ -98,6 +108,7 @@ export class RadnaListaComponent implements OnInit {
       .subscribe((worker) => {
         if (worker) {
           this.fillWorkerInfo(worker);
+          this.currentWorker = worker;
         } else {
           this.openDialog(true, 'Greška', 'Uneli ste nepostojećeg radnika!');
         }
@@ -105,10 +116,10 @@ export class RadnaListaComponent implements OnInit {
   }
 
   fillWorkerInfo(worker: IWorker) {
-    this.ELEMENT_DATA_RADNIK = [];
-    this.ELEMENT_DATA_RADNIK.push(worker);
+    this.ELEMENT_DATA_WORKER = [];
+    this.ELEMENT_DATA_WORKER.push(worker);
     this.frmWorksheet.get('sifraRadnika').setValue(worker.sifra);
-    this.radnikTable = new MatTableDataSource(this.ELEMENT_DATA_RADNIK);
+    this.radnikTable = new MatTableDataSource(this.ELEMENT_DATA_WORKER);
   }
 
   findWorksheet(event) {
@@ -124,35 +135,70 @@ export class RadnaListaComponent implements OnInit {
             this.fillWorkerInfo(worksheet.worker);
             if (worksheet.presenceItemList) {
               this.fillPresenceItemListInfo(worksheet.presenceItemList);
+              this.getNextNumberForInsertPresence(worksheet.presenceItemList);
             }
             if (worksheet.absenceItemList) {
               this.fillAbsenceItemListInfo(worksheet.absenceItemList);
+              this.getNextNumberForInsertAbsence(worksheet.absenceItemList);
             }
+            this.worksheetTitle = 'Izmena radne liste';
+            this.frmWorksheetMode = FormMode.update;
           } else {
             this.openDialog(
               true,
               'Greška',
               'Uneli ste nepostojeću radnu listu!'
             );
+            this.frmWorksheetMode = FormMode.insert;
           }
         },
       });
   }
 
-  fillPresenceItemListInfo(presenceItemList: IPresenceItem[]) {
-    this.ELEMENT_DATA_PRISUSTVO = [];
-    for (let p of presenceItemList) {
-      this.ELEMENT_DATA_PRISUSTVO.push(p);
+  getNextNumberForInsertPresence(presenceItemList: IPresenceItem[]) {
+    if (presenceItemList) {
+      this.nextRedniBrojPrisustvo =
+        Math.max.apply(
+          Math,
+          presenceItemList.map(function (o) {
+            return o.redniBroj;
+          })
+        ) + 1;
+    } else {
+      this.nextRedniBrojPrisustvo = 1;
     }
-    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRISUSTVO);
+    this.frmWorksheet
+      .get('prisustvo.redniBrojPrisustva')
+      .setValue(this.nextRedniBrojPrisustvo);
+  }
+
+  getNextNumberForInsertAbsence(absenceItemList: IAbsenceItem[]) {
+    if (absenceItemList) {
+      this.nextRedniBrojOdsustvo =
+        Math.max.apply(
+          Math,
+          absenceItemList.map(function (o) {
+            return o.redniBroj;
+          })
+        ) + 1;
+    } else {
+      this.nextRedniBrojOdsustvo = 1;
+    }
+    this.frmWorksheet
+      .get('odsustvo.redniBrojOdsustva')
+      .setValue(this.nextRedniBrojOdsustvo);
+  }
+
+  fillPresenceItemListInfo(presenceItemList: IPresenceItem[]) {
+    this.ELEMENT_DATA_PRESENCE = [];
+    presenceItemList.forEach((p) => this.ELEMENT_DATA_PRESENCE.push(p));
+    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
   }
 
   fillAbsenceItemListInfo(absenceItemList: IAbsenceItem[]) {
-    this.ELEMENT_DATA_ODSUSTVO = [];
-    for (let o of absenceItemList) {
-      this.ELEMENT_DATA_ODSUSTVO.push(o);
-    }
-    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ODSUSTVO);
+    this.ELEMENT_DATA_ABSENCE = [];
+    absenceItemList.forEach((a) => this.ELEMENT_DATA_ABSENCE.push(a));
+    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
   }
 
   showDate(date: Date): string {
@@ -177,7 +223,6 @@ export class RadnaListaComponent implements OnInit {
     switch (vrsta) {
       case 0:
         return 'Godišnji odmor';
-
       case 1:
         return 'Službeni put';
       case 2:
@@ -199,25 +244,213 @@ export class RadnaListaComponent implements OnInit {
 
   createNewWorksheet(event) {
     event.preventDefault();
-    this.worksheetService
-      .getNewId()
-      .subscribe((id) => this.frmWorksheet.get('sifraRadneListe').setValue(id));
+    this.worksheetService.getNewId().subscribe((id) => {
+      this.worksheetTitle = 'Unos radne liste';
+      this.frmWorksheetMode = FormMode.insert;
+      this.resetAllFields(null);
+      this.frmWorksheet.get('sifraRadneListe').setValue(id);
+      this.getNextNumberForInsertPresence(null);
+      this.getNextNumberForInsertAbsence(null);
+    });
+  }
+
+  highlightPresenceItem(row) {
+    if (this.selectedPresenceRowIndex == row.redniBroj) {
+      this.selectedPresenceRowIndex = -1;
+      this.resetPresenceItemForm();
+      this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
+    } else {
+      this.presenceMode = FormMode.update;
+      this.selectedPresenceRowIndex = row.redniBroj;
+      this.frmWorksheet
+        .get('prisustvo.redniBrojPrisustva')
+        .setValue(row.redniBroj);
+      this.frmWorksheet.get('prisustvo.opisPrisustva').setValue(row.opis);
+      this.frmWorksheet
+        .get('prisustvo.vrstaPrisustva')
+        .setValue(row.vrstaPrisustva);
+      this.frmWorksheet.get('prisustvo.datumPrisustva').setValue(row.datum);
+    }
   }
 
   deletePresenceItem(event) {
     event.preventDefault();
+    if (this.selectedPresenceRowIndex == -1) {
+      this.openDialog(true, 'Greška', 'Morate odabrati neki red!');
+      return;
+    }
+    this.ELEMENT_DATA_PRESENCE = this.ELEMENT_DATA_PRESENCE.filter(
+      (value, index, array) => value.redniBroj != this.selectedPresenceRowIndex
+    );
+    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
+    this.resetPresenceItemForm();
+    this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
+    this.selectedPresenceRowIndex = -1;
   }
 
   savePresenceItem(event) {
     event.preventDefault();
+    if (this.frmWorksheet.get('prisustvo').invalid) {
+      this.openDialog(true, 'Greška', 'Sva polja su obavezna!');
+      return;
+    }
+    let presenceItem: IPresenceItem = this.createPresenceItemFromForm();
+    if ((this.presenceMode as FormMode) === FormMode.insert) {
+      this.insertPresenceItem(presenceItem);
+    } else {
+      this.updatePresenceItem(presenceItem);
+    }
+  }
+
+  createPresenceItemFromForm(): IPresenceItem {
+    let presenceItem: IPresenceItem = {
+      redniBroj: this.frmWorksheet.get('prisustvo.redniBrojPrisustva').value,
+      vrstaPrisustva: +this.frmWorksheet.get('prisustvo.vrstaPrisustva').value,
+      opis: this.frmWorksheet.get('prisustvo.opisPrisustva').value,
+      datum: this.frmWorksheet.get('prisustvo.datumPrisustva').value,
+    };
+    return presenceItem;
+  }
+
+  insertPresenceItem(presenceItem) {
+    this.ELEMENT_DATA_PRESENCE.push(presenceItem);
+    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
+    this.openDialog(
+      false,
+      'Obaveštenje',
+      'Uspešno ste uneli novu stavku prisustva!'
+    );
+    this.resetPresenceItemForm();
+    this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
+  }
+
+  updatePresenceItem(presenceItem) {
+    this.ELEMENT_DATA_PRESENCE[this.selectedPresenceRowIndex - 1] =
+      presenceItem;
+    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
+    this.openDialog(
+      false,
+      'Obaveštenje',
+      'Uspešno ste izmenili stavku prisustva!'
+    );
+    this.resetPresenceItemForm();
+    this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
+    console.log(this.ELEMENT_DATA_PRESENCE);
+  }
+
+  resetPresenceItemForm() {
+    this.presenceMode = FormMode.insert;
+    this.selectedPresenceRowIndex = -1;
+    this.frmWorksheet.get('prisustvo.redniBrojPrisustva').setValue(null);
+    this.frmWorksheet.get('prisustvo.vrstaPrisustva').setValue('0');
+    this.frmWorksheet.get('prisustvo.opisPrisustva').reset();
+    this.frmWorksheet.get('prisustvo.datumPrisustva').setValue(new Date());
+  }
+
+  highlightAbsenceItem(row) {
+    if (this.selectedAbsenceRowIndex == row.redniBroj) {
+      this.selectedAbsenceRowIndex = -1;
+      this.resetAbsenceItemForm();
+      this.getNextNumberForInsertAbsence(this.ELEMENT_DATA_ABSENCE);
+    } else {
+      this.abseceneMode = FormMode.update;
+      this.selectedAbsenceRowIndex = row.redniBroj;
+      this.frmWorksheet
+        .get('odsustvo.redniBrojOdsustva')
+        .setValue(row.redniBroj);
+      this.frmWorksheet
+        .get('odsustvo.vrstaOdsustva')
+        .setValue(row.vrstaOdsustva);
+      this.frmWorksheet.get('odsustvo.brojOdluke').setValue(row.brojOdluke);
+      this.frmWorksheet.get('odsustvo.datumOd').setValue(row.datumOd);
+      this.frmWorksheet.get('odsustvo.datumDo').setValue(row.datumDo);
+    }
   }
 
   deleteAbsenceItem(event) {
     event.preventDefault();
+    if (this.selectedAbsenceRowIndex == -1) {
+      this.openDialog(true, 'Greška', 'Morate odabrati neki red!');
+      return;
+    }
+    this.ELEMENT_DATA_ABSENCE = this.ELEMENT_DATA_ABSENCE.filter(
+      (value, index, array) => value.redniBroj != this.selectedAbsenceRowIndex
+    );
+    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
+    this.resetAbsenceItemForm();
+    this.getNextNumberForInsertAbsence(this.ELEMENT_DATA_ABSENCE);
+    this.selectedAbsenceRowIndex = -1;
   }
 
   saveAbsenceItem(event) {
     event.preventDefault();
+    if (this.frmWorksheet.get('odsustvo').invalid) {
+      this.openDialog(true, 'Greška', 'Sva polja su obavezna!');
+      return;
+    }
+    let datumOd = this.datepipe.transform(
+      this.frmWorksheet.get('odsustvo.datumOd').value,
+      'dd.MM.yyyy.'
+    );
+    let datumDo = this.datepipe.transform(
+      this.frmWorksheet.get('odsustvo.datumDo').value,
+      'dd.MM.yyyy.'
+    );
+    if (datumOd > datumDo) {
+      this.openDialog(true, 'Greška', 'Datum od ne može biti nakon datuma do!');
+      return;
+    }
+    let absenceItem: IAbsenceItem = this.createAbsenceItemFromForm();
+    if ((this.abseceneMode as FormMode) === FormMode.insert) {
+      this.insertAbsenceItem(absenceItem);
+    } else {
+      this.updateAbsenceItem(absenceItem);
+    }
+  }
+
+  createAbsenceItemFromForm() {
+    let absenceItem: IAbsenceItem = {
+      redniBroj: this.frmWorksheet.get('odsustvo.redniBrojOdsustva').value,
+      brojOdluke: this.frmWorksheet.get('odsustvo.brojOdluke').value,
+      vrstaOdsustva: +this.frmWorksheet.get('odsustvo.vrstaOdsustva').value,
+      datumOd: this.frmWorksheet.get('odsustvo.datumOd').value,
+      datumDo: this.frmWorksheet.get('odsustvo.datumDo').value,
+    };
+    return absenceItem;
+  }
+
+  insertAbsenceItem(absenceItem: IAbsenceItem) {
+    this.ELEMENT_DATA_ABSENCE.push(absenceItem);
+    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
+    this.openDialog(
+      false,
+      'Obaveštenje',
+      'Uspešno ste uneli novu stavku odsustva!'
+    );
+    this.resetAbsenceItemForm();
+    this.getNextNumberForInsertAbsence(this.ELEMENT_DATA_ABSENCE);
+  }
+
+  updateAbsenceItem(absenceItem: IAbsenceItem) {
+    this.ELEMENT_DATA_ABSENCE[this.selectedAbsenceRowIndex - 1] = absenceItem;
+    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
+    this.openDialog(
+      false,
+      'Obaveštenje',
+      'Uspešno ste izmenili stavku odsustva!'
+    );
+    this.resetAbsenceItemForm();
+    this.getNextNumberForInsertAbsence(this.ELEMENT_DATA_ABSENCE);
+  }
+
+  resetAbsenceItemForm() {
+    this.abseceneMode = FormMode.insert;
+    this.selectedAbsenceRowIndex = -1;
+    this.frmWorksheet.get('odsustvo.redniBrojOdsustva').setValue(null);
+    this.frmWorksheet.get('odsustvo.vrstaOdsustva').setValue('0');
+    this.frmWorksheet.get('odsustvo.brojOdluke').reset();
+    this.frmWorksheet.get('odsustvo.datumOd').setValue(new Date());
+    this.frmWorksheet.get('odsustvo.datumDo').setValue(new Date());
   }
 
   openDialog(isError: boolean, dialogTitle: string, dialogText: string): void {
@@ -232,21 +465,111 @@ export class RadnaListaComponent implements OnInit {
   }
 
   resetAllFields(event) {
-    event.preventDefault();
+    if (event) {
+      event.preventDefault();
+    }
+    this.worksheetTitle = 'Unos radne liste';
+    this.currentWorker = null;
+    this.frmWorksheetMode = FormMode.insert;
     this.frmWorksheet.reset();
+    this.frmWorksheet.get('prisustvo.vrstaPrisustva').setValue('0');
+    this.frmWorksheet.get('odsustvo.vrstaOdsustva').setValue('0');
     this.frmWorksheet.get('prisustvo.datumPrisustva').setValue(new Date());
     this.frmWorksheet.get('odsustvo.datumOd').setValue(new Date());
     this.frmWorksheet.get('odsustvo.datumDo').setValue(new Date());
-    this.ELEMENT_DATA_RADNIK = [];
-    this.radnikTable = new MatTableDataSource(this.ELEMENT_DATA_RADNIK);
-    this.ELEMENT_DATA_PRISUSTVO = [];
-    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRISUSTVO);
-    this.ELEMENT_DATA_ODSUSTVO = [];
-    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ODSUSTVO);
+    this.ELEMENT_DATA_WORKER = [];
+    this.radnikTable = new MatTableDataSource(this.ELEMENT_DATA_WORKER);
+    this.ELEMENT_DATA_PRESENCE = [];
+    this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
+    this.ELEMENT_DATA_ABSENCE = [];
+    this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
+    this.selectedPresenceRowIndex = -1;
+    this.selectedAbsenceRowIndex = -1;
+    this.presenceMode = FormMode.insert;
+    this.abseceneMode = FormMode.insert;
+    this.nextRedniBrojPrisustvo = 1;
+    this.nextRedniBrojOdsustvo = 1;
   }
 
   saveWorksheet(event) {
     event.preventDefault();
+    if (this.frmWorksheet.get('sifraRadneListe').invalid) {
+      this.openDialog(true, 'Greška', 'Morate uneti radnu listu!');
+      return;
+    }
+    if (this.frmWorksheet.get('sifraRadnika').invalid) {
+      this.openDialog(true, 'Greška', 'Morate uneti radnika!');
+      return;
+    }
+    if (
+      this.ELEMENT_DATA_PRESENCE.length === 0 &&
+      this.ELEMENT_DATA_ABSENCE.length === 0
+    ) {
+      this.openDialog(
+        true,
+        'Greška',
+        'Morate uneti barem jednu stavku prisustva ili odsustva!'
+      );
+      return;
+    }
+    let worksheet: IWorksheet = this.createWorksheetFromForm();
+    if ((this.frmWorksheetMode as FormMode) === FormMode.insert) {
+      this.insertWorksheet(worksheet);
+    } else {
+      this.updateWorksheet(worksheet);
+    }
+  }
+
+  insertWorksheet(worksheet: IWorksheet) {
+    this.worksheetService.insertWorksheet(worksheet).subscribe({
+      next: (response) => {
+        if (response) {
+          this.resetAllFields(null);
+          this.openDialog(
+            false,
+            'Obaveštenje',
+            'Uspešno ste uneli novu radnu listu!'
+          );
+        } else {
+          this.openDialog(
+            true,
+            'Greška',
+            'Došlo je do greške prilikom unosa radne liste!'
+          );
+        }
+      },
+    });
+  }
+
+  updateWorksheet(worksheet: IWorksheet) {
+    this.worksheetService.updateWorksheet(worksheet).subscribe({
+      next: (response) => {
+        if (response) {
+          this.resetAllFields(null);
+          this.openDialog(
+            false,
+            'Obaveštenje',
+            'Uspešno ste izmenili radnu listu!'
+          );
+        } else {
+          this.openDialog(
+            true,
+            'Greška',
+            'Došlo je do greške prilikom izmene radne liste!'
+          );
+        }
+      },
+    });
+  }
+
+  createWorksheetFromForm(): IWorksheet {
+    let worksheet: IWorksheet = {
+      sifra: this.frmWorksheet.get('sifraRadneListe').value,
+      worker: this.currentWorker,
+      presenceItemList: this.ELEMENT_DATA_PRESENCE,
+      absenceItemList: this.ELEMENT_DATA_ABSENCE,
+    };
+    return worksheet;
   }
 
   redirectToMainPage() {

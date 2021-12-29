@@ -140,9 +140,7 @@
                                     matNativeControl
                                     formControlName="vrstaPrisustva"
                                   >
-                                    <option value="0" selected>
-                                      Radno vreme
-                                    </option>
+                                    <option value="0">Radno vreme</option>
                                     <option value="1">Prekovremeno</option>
                                     <option value="2">Vikend</option>
                                     <option value="3">Praznik</option>
@@ -256,6 +254,11 @@
                                 let row;
                                 columns: prisustvoTableColumns
                               "
+                              [ngClass]="{
+                                highlight:
+                                  selectedPresenceRowIndex == row.redniBroj
+                              }"
+                              (click)="highlightPresenceItem(row)"
                             ></tr>
                           </table>
                         </section>
@@ -444,6 +447,11 @@
                                 let row;
                                 columns: odsustvoTableColumns
                               "
+                              [ngClass]="{
+                                highlight:
+                                  selectedAbsenceRowIndex == row.redniBroj
+                              }"
+                              (click)="highlightAbsenceItem(row)"
                             ></tr>
                           </table>
                         </section>

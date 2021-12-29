@@ -1,16 +1,16 @@
 export interface IPresenceItem {
-  worksheetId: number;
+  worksheetId?: number;
   redniBroj: number;
-  vrstaPrisustva: number;
+  vrstaPrisustva: any;
   opis: string;
   datum: Date;
 }
 
 export interface IAbsenceItem {
-  worksheetId: number;
+  worksheetId?: number;
   redniBroj: number;
   brojOdluke: number;
-  vrstaOdsustva: number;
+  vrstaOdsustva: any;
   datumOd: Date;
   datumDo: Date;
 }

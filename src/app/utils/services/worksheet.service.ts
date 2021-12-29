@@ -19,4 +19,12 @@ export class WorksheetService {
   findWorksheet(sifra: number): Observable<IWorksheet> {
     return this.httpClient.get<IWorksheet>(this.url + sifra);
   }
+
+  insertWorksheet(worksheet: IWorksheet): Observable<boolean> {
+    return this.httpClient.post<boolean>(this.url, worksheet);
+  }
+
+  updateWorksheet(worksheet: IWorksheet): Observable<boolean> {
+    return this.httpClient.put<boolean>(this.url, worksheet);
+  }
 }
