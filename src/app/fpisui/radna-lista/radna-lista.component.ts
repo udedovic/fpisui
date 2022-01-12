@@ -30,6 +30,7 @@ export class RadnaListaComponent implements OnInit {
   frmWorksheetMode: FormMode = FormMode.insert;
 
   //prisustvo
+  presenceArrayForDatabase: IPresenceItem[] = [];
   ELEMENT_DATA_PRESENCE: IPresenceItem[] = [];
   prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
   prisustvoTableColumns: string[] = [
@@ -43,6 +44,7 @@ export class RadnaListaComponent implements OnInit {
   selectedPresenceRowIndex = -1;
 
   //odsustvo
+  absenceArrayForDatabase: IAbsenceItem[] = [];
   ELEMENT_DATA_ABSENCE: IAbsenceItem[] = [];
   odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
   odsustvoTableColumns: string[] = [
@@ -143,6 +145,7 @@ export class RadnaListaComponent implements OnInit {
             }
             this.worksheetTitle = 'Izmena radne liste';
             this.frmWorksheetMode = FormMode.update;
+            this.currentWorker = worksheet.worker;
           } else {
             this.openDialog(
               true,
@@ -156,7 +159,7 @@ export class RadnaListaComponent implements OnInit {
   }
 
   getNextNumberForInsertPresence(presenceItemList: IPresenceItem[]) {
-    if (presenceItemList) {
+    if (presenceItemList && presenceItemList.length > 0) {
       this.nextRedniBrojPrisustvo =
         Math.max.apply(
           Math,
@@ -173,7 +176,7 @@ export class RadnaListaComponent implements OnInit {
   }
 
   getNextNumberForInsertAbsence(absenceItemList: IAbsenceItem[]) {
-    if (absenceItemList) {
+    if (absenceItemList && absenceItemList.length > 0) {
       this.nextRedniBrojOdsustvo =
         Math.max.apply(
           Math,
@@ -191,13 +194,21 @@ export class RadnaListaComponent implements OnInit {
 
   fillPresenceItemListInfo(presenceItemList: IPresenceItem[]) {
     this.ELEMENT_DATA_PRESENCE = [];
-    presenceItemList.forEach((p) => this.ELEMENT_DATA_PRESENCE.push(p));
+    presenceItemList.forEach((p) => {
+      this.ELEMENT_DATA_PRESENCE.push(p);
+      p.status = '';
+      this.presenceArrayForDatabase.push(p);
+    });
     this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
   }
 
   fillAbsenceItemListInfo(absenceItemList: IAbsenceItem[]) {
     this.ELEMENT_DATA_ABSENCE = [];
-    absenceItemList.forEach((a) => this.ELEMENT_DATA_ABSENCE.push(a));
+    absenceItemList.forEach((a) => {
+      this.ELEMENT_DATA_ABSENCE.push(a);
+      a.status = '';
+      this.absenceArrayForDatabase.push(a);
+    });
     this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
   }
 
@@ -282,6 +293,25 @@ export class RadnaListaComponent implements OnInit {
     this.ELEMENT_DATA_PRESENCE = this.ELEMENT_DATA_PRESENCE.filter(
       (value, index, array) => value.redniBroj != this.selectedPresenceRowIndex
     );
+    for (let i = 0; i < this.ELEMENT_DATA_PRESENCE.length; i++) {
+      this.ELEMENT_DATA_PRESENCE[i].redniBroj = i + 1;
+    }
+    let indexInsert = this.presenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedPresenceRowIndex &&
+        value.status == 'insert'
+    );
+    if (indexInsert != -1) {
+      this.presenceArrayForDatabase.splice(indexInsert, 1);
+    }
+    let index = this.presenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedPresenceRowIndex &&
+        value.status != 'insert'
+    );
+    if (index != -1) {
+      this.presenceArrayForDatabase[index].status = 'delete';
+    }
     this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
     this.resetPresenceItemForm();
     this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
@@ -312,8 +342,10 @@ export class RadnaListaComponent implements OnInit {
     return presenceItem;
   }
 
-  insertPresenceItem(presenceItem) {
+  insertPresenceItem(presenceItem: IPresenceItem) {
     this.ELEMENT_DATA_PRESENCE.push(presenceItem);
+    presenceItem.status = 'insert';
+    this.presenceArrayForDatabase.push(presenceItem);
     this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
     this.openDialog(
       false,
@@ -324,9 +356,18 @@ export class RadnaListaComponent implements OnInit {
     this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
   }
 
-  updatePresenceItem(presenceItem) {
+  updatePresenceItem(presenceItem: IPresenceItem) {
     this.ELEMENT_DATA_PRESENCE[this.selectedPresenceRowIndex - 1] =
       presenceItem;
+    presenceItem.status = 'update';
+    let index = this.presenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedPresenceRowIndex &&
+        value.status != 'delete'
+    );
+    if (index != -1) {
+      this.presenceArrayForDatabase[index] = presenceItem;
+    }
     this.prisustvoTable = new MatTableDataSource(this.ELEMENT_DATA_PRESENCE);
     this.openDialog(
       false,
@@ -335,7 +376,6 @@ export class RadnaListaComponent implements OnInit {
     );
     this.resetPresenceItemForm();
     this.getNextNumberForInsertPresence(this.ELEMENT_DATA_PRESENCE);
-    console.log(this.ELEMENT_DATA_PRESENCE);
   }
 
   resetPresenceItemForm() {
@@ -376,6 +416,25 @@ export class RadnaListaComponent implements OnInit {
     this.ELEMENT_DATA_ABSENCE = this.ELEMENT_DATA_ABSENCE.filter(
       (value, index, array) => value.redniBroj != this.selectedAbsenceRowIndex
     );
+    for (let i = 0; i < this.ELEMENT_DATA_ABSENCE.length; i++) {
+      this.ELEMENT_DATA_ABSENCE[i].redniBroj = i + 1;
+    }
+    let indexInsert = this.absenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedAbsenceRowIndex &&
+        value.status == 'insert'
+    );
+    if (indexInsert != -1) {
+      this.absenceArrayForDatabase.splice(indexInsert, 1);
+    }
+    let index = this.absenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedAbsenceRowIndex &&
+        value.status != 'insert'
+    );
+    if (index != -1) {
+      this.absenceArrayForDatabase[index].status = 'delete';
+    }
     this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
     this.resetAbsenceItemForm();
     this.getNextNumberForInsertAbsence(this.ELEMENT_DATA_ABSENCE);
@@ -421,6 +480,8 @@ export class RadnaListaComponent implements OnInit {
 
   insertAbsenceItem(absenceItem: IAbsenceItem) {
     this.ELEMENT_DATA_ABSENCE.push(absenceItem);
+    absenceItem.status = 'insert';
+    this.absenceArrayForDatabase.push(absenceItem);
     this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
     this.openDialog(
       false,
@@ -433,6 +494,15 @@ export class RadnaListaComponent implements OnInit {
 
   updateAbsenceItem(absenceItem: IAbsenceItem) {
     this.ELEMENT_DATA_ABSENCE[this.selectedAbsenceRowIndex - 1] = absenceItem;
+    absenceItem.status = 'update';
+    let index = this.absenceArrayForDatabase.findIndex(
+      (value, index, array) =>
+        value.redniBroj == this.selectedAbsenceRowIndex &&
+        value.status != 'delete'
+    );
+    if (index != -1) {
+      this.absenceArrayForDatabase[index] = absenceItem;
+    }
     this.odsustvoTable = new MatTableDataSource(this.ELEMENT_DATA_ABSENCE);
     this.openDialog(
       false,
@@ -542,6 +612,7 @@ export class RadnaListaComponent implements OnInit {
   }
 
   updateWorksheet(worksheet: IWorksheet) {
+    console.log(worksheet);
     this.worksheetService.updateWorksheet(worksheet).subscribe({
       next: (response) => {
         if (response) {
@@ -566,8 +637,8 @@ export class RadnaListaComponent implements OnInit {
     let worksheet: IWorksheet = {
       sifra: this.frmWorksheet.get('sifraRadneListe').value,
       worker: this.currentWorker,
-      presenceItemList: this.ELEMENT_DATA_PRESENCE,
-      absenceItemList: this.ELEMENT_DATA_ABSENCE,
+      presenceItemList: this.presenceArrayForDatabase,
+      absenceItemList: this.absenceArrayForDatabase,
     };
     return worksheet;
   }

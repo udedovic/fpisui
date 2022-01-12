@@ -4,6 +4,7 @@ export interface IPresenceItem {
   vrstaPrisustva: any;
   opis: string;
   datum: Date;
+  status?: string;
 }
 
 export interface IAbsenceItem {
@@ -13,4 +14,5 @@ export interface IAbsenceItem {
   vrstaOdsustva: any;
   datumOd: Date;
   datumDo: Date;
+  status?: string;
 }
