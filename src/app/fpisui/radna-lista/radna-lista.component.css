@@ -6,19 +6,7 @@
   display: flex;
   flex-direction: column;
   align-content: center;
-}
-
-.main-part {
-  height: 89vh;
-}
-
-.item-card {
-  height: 61vh;
-}
-
-.radnik-table {
-  width: 40%;
-  height: 50px !important;
+  overflow: auto;
 }
 
 .item-table-section {
@@ -121,7 +109,7 @@ small {
   font-family: "Poppins-Bold" !important;
 }
 
-.highlight{
+.highlight {
   background: #6abea7;
 }
 
@@ -185,15 +173,15 @@ small {
   color: #000 !important;
 }
 
-:host ::ng-deep datepicker-value-example .mat-form-field-label{
-  color:#6abea7;
+:host ::ng-deep datepicker-value-example .mat-form-field-label {
+  color: #6abea7;
 }
 
-:host ::ng-deep .mat-datepicker-toggle{
-  color:#6abea7;
+:host ::ng-deep .mat-datepicker-toggle {
+  color: #6abea7;
 }
 
-::ng-deep .mat-calendar-body-selected{
+::ng-deep .mat-calendar-body-selected {
   background-color: #6abea7;
 }
 
@@ -203,4 +191,46 @@ input[type="number"]::-webkit-outer-spin-button {
   -moz-appearance: none;
   appearance: none;
   margin: 0;
+}
+
+@media only screen and (max-width: 1400px) {
+  .items-part,
+  .form-part {
+    flex-direction: column;
+  }
+
+  .radnik-table {
+    align-self: center;
+    width: 80%;
+    margin-bottom: 20px;
+    overflow: auto;
+  }
+
+  .main-part {
+    height: auto;
+  }
+
+  .item-card {
+    height: 50vh;
+  }
+}
+
+@media only screen and (min-width: 1400px) {
+  .items-part,
+  .form-part {
+    flex-direction: row;
+  }
+
+  .main-part {
+    height: 89vh;
+  }
+
+  .radnik-table {
+    width: 40%;
+    height: 50px !important;
+  }
+
+  .item-card {
+    height: 61vh;
+  }
 }

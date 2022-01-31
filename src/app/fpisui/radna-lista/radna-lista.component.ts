@@ -134,15 +134,17 @@ export class RadnaListaComponent implements OnInit {
       .subscribe({
         next: (worksheet) => {
           if (worksheet) {
+            this.resetAllFields(null);
+            this.frmWorksheet.get('sifraRadneListe').setValue(worksheet.sifra);
             this.fillWorkerInfo(worksheet.worker);
             if (worksheet.presenceItemList) {
               this.fillPresenceItemListInfo(worksheet.presenceItemList);
-              this.getNextNumberForInsertPresence(worksheet.presenceItemList);
             }
+            this.getNextNumberForInsertPresence(worksheet.presenceItemList);
             if (worksheet.absenceItemList) {
               this.fillAbsenceItemListInfo(worksheet.absenceItemList);
-              this.getNextNumberForInsertAbsence(worksheet.absenceItemList);
             }
+            this.getNextNumberForInsertAbsence(worksheet.absenceItemList);
             this.worksheetTitle = 'Izmena radne liste';
             this.frmWorksheetMode = FormMode.update;
             this.currentWorker = worksheet.worker;
